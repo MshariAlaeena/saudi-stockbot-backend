@@ -11,6 +11,7 @@ import (
 	"patient-chatbot/internal/client/stock"
 	"patient-chatbot/internal/config"
 	"patient-chatbot/internal/dto"
+	"strings"
 	"time"
 )
 
@@ -51,13 +52,6 @@ func (s *Service) Chat(ctx context.Context, request dto.ChatRequestDTO) (*dto.LL
 		toolCall := toolCalls[0]
 		switch toolCall.Function.Name {
 		case stock.FunctionSearchCompanyStocks:
-			if MOCK_DATA {
-				return &dto.LLMResponse{
-					Answer: answer,
-					Stocks: s.GetMockSearchCompanyStocks(),
-					Chart:  dto.ChartsSearchCompanyStocks,
-				}, nil
-			}
 			var rawArg json.RawMessage = toolCall.Function.Arguments
 			var jsonText string
 			if err := json.Unmarshal(rawArg, &jsonText); err != nil {
@@ -67,6 +61,13 @@ func (s *Service) Chat(ctx context.Context, request dto.ChatRequestDTO) (*dto.LL
 			err := json.Unmarshal([]byte(jsonText), &searchCompanyStocksResponse)
 			if err != nil {
 				return nil, err
+			}
+			if MOCK_DATA {
+				return &dto.LLMResponse{
+					Answer: answer,
+					Stocks: s.GetMockSearchCompanyStocks(searchCompanyStocksResponse.CompanyName),
+					Chart:  dto.ChartsSearchCompanyStocks,
+				}, nil
 			}
 			getDetailedCompanyStockPricesResponse, err := s.stockClient.SearchCompanyStocks(searchCompanyStocksResponse.CompanyName)
 			if err != nil {
@@ -147,17 +148,17 @@ func (s *Service) GetCompanyChart(ID string) ([]stock.GetDetailedCompanyStockPri
 	return s.stockClient.GetDetailedCompanyStockPrices(ID)
 }
 
-func (s *Service) GetMockSearchCompanyStocks() *stock.SearchCompanyStocksResponse {
+func (s *Service) GetMockSearchCompanyStocks(companyName string) *stock.SearchCompanyStocksResponse {
 	return &stock.SearchCompanyStocksResponse{
-		TadawulID:     "4536",
+		TadawulID:     fmt.Sprintf("%04d", 100+rand.IntN(9900)),
 		CompanyID:     1,
-		CompanyName:   "ASM Company",
+		CompanyName:   strings.ToUpper(companyName),
 		Sector:        "Technology",
-		AcrynomNameAr: "ASM",
-		ArgaamID:      "102001",
-		CompanyNameAr: "شركة الصناعات التكنولوجية",
+		AcrynomNameAr: companyName,
+		ArgaamID:      fmt.Sprintf("%04d", 100+rand.IntN(10100)),
+		CompanyNameAr: "",
 		SectorAr:      "التكنولوجيا",
-		AcrynomName:   "ASM",
+		AcrynomName:   companyName,
 		Price:         math.Round(rand.Float64()*1000) / 100,
 		Change:        math.Round(rand.Float64()*100) / 100,
 		ChangePercent: math.Round(rand.Float64()*100) / 100,
