@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"patient-chatbot/internal/client/llm"
 	"patient-chatbot/internal/client/stock"
 	"patient-chatbot/internal/config"
@@ -41,7 +42,11 @@ func NewServer(cfg *config.Config) *Server {
 }
 
 func (s *Server) Run() error {
-	return s.router.Run(":8080")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	return s.router.Run(":" + port)
 }
 
 func RegisterRoutes(r *gin.Engine, h *handler.Handler) {
