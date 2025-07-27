@@ -8,10 +8,6 @@ import (
 )
 
 type Config struct {
-	PineconeNamespace    string
-	PineconeAPIKey       string
-	PineconeHost         string
-	PineconeIndex        string
 	GroqAPIKey           string
 	LLMModel             string
 	ArabicLLMModel       string
@@ -28,10 +24,6 @@ func Load() (*Config, error) {
 	}
 
 	cfg := &Config{
-		PineconeNamespace:    os.Getenv("PINECONE_NAMESPACE"),
-		PineconeAPIKey:       os.Getenv("PINECONE_API_KEY"),
-		PineconeIndex:        os.Getenv("PINECONE_INDEX"),
-		PineconeHost:         os.Getenv("PINECONE_HOST"),
 		GroqAPIKey:           os.Getenv("GROQ_API_KEY"),
 		LLMModel:             os.Getenv("LLM_MODEL"),
 		ArabicLLMModel:       os.Getenv("ARABIC_LLM_MODEL"),
@@ -41,10 +33,7 @@ func Load() (*Config, error) {
 		RapidAPIHost:         os.Getenv("RAPID_API_HOST"),
 	}
 
-	if cfg.PineconeAPIKey == "" ||
-		cfg.PineconeIndex == "" ||
-		cfg.PineconeHost == "" ||
-		cfg.GroqAPIKey == "" ||
+	if cfg.GroqAPIKey == "" ||
 		cfg.LLMModel == "" ||
 		cfg.ArabicLLMModel == "" ||
 		cfg.MULTIMODAL_LLM_MODEL == "" ||

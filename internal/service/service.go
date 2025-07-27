@@ -9,7 +9,6 @@ import (
 	"os"
 	"patient-chatbot/internal/client/llm"
 	"patient-chatbot/internal/client/stock"
-	"patient-chatbot/internal/client/vectordb"
 	"patient-chatbot/internal/config"
 	"patient-chatbot/internal/dto"
 	"time"
@@ -20,23 +19,20 @@ import (
 var MOCK_DATA = os.Getenv("MOCK_DATA") == "true"
 
 type Service struct {
-	cfg            *config.Config
-	llmClient      *llm.LLMClient
-	vectordbClient *vectordb.VectordbClient
-	stockClient    *stock.StockClient
+	cfg         *config.Config
+	llmClient   *llm.LLMClient
+	stockClient *stock.StockClient
 }
 
 func NewService(
 	cfg *config.Config,
 	llmClient *llm.LLMClient,
-	vectordbClient *vectordb.VectordbClient,
 	stockClient *stock.StockClient,
 ) *Service {
 	return &Service{
-		cfg:            cfg,
-		llmClient:      llmClient,
-		vectordbClient: vectordbClient,
-		stockClient:    stockClient,
+		cfg:         cfg,
+		llmClient:   llmClient,
+		stockClient: stockClient,
 	}
 }
 

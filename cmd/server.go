@@ -3,7 +3,6 @@ package main
 import (
 	"patient-chatbot/internal/client/llm"
 	"patient-chatbot/internal/client/stock"
-	"patient-chatbot/internal/client/vectordb"
 	"patient-chatbot/internal/config"
 	"patient-chatbot/internal/handler"
 	logger "patient-chatbot/internal/log"
@@ -13,7 +12,6 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog/log"
 )
 
 type Server struct {
@@ -34,11 +32,7 @@ func NewServer(cfg *config.Config) *Server {
 
 	stockClient := stock.NewStockClient(cfg)
 	llmClient := llm.NewLLMClient(cfg, stockClient)
-	vectordbClient, err := vectordb.NewVectordbClient(cfg)
-	if err != nil {
-		log.Error().Msg("Failed to create vectordb client: " + err.Error())
-	}
-	chatService := service.NewService(cfg, llmClient, vectordbClient, stockClient)
+	chatService := service.NewService(cfg, llmClient, stockClient)
 	h := handler.NewHandler(chatService)
 
 	RegisterRoutes(r, h)
