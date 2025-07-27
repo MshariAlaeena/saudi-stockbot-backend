@@ -105,6 +105,8 @@ func (c *StockClient) GetTodayTopFiveGainersOrLosers(topGainersOrLosers TopGaine
 		return nil, fmt.Errorf("stock client :: GetTodayTopFiveGainersOrLosers :: error calling rapidAPI: %w", err)
 	}
 
+	log.Info().Msg("stock client :: GetTodayTopFiveGainersOrLosers :: response: " + string(res.Data))
+
 	var details []TopFiveGainersOrLosersResponse
 	err = json.Unmarshal(res.Data, &details)
 	if err != nil {
