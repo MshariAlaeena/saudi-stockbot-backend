@@ -174,15 +174,14 @@ func (c *StockClient) callRapidAPI(req *http.Request) (*RapidAPIResponse, error)
 		return nil, fmt.Errorf("stock client :: callRapidAPI :: error reading body: %w", err)
 	}
 
+	log.Info().Msgf("RapidAPI full body: %s", string(body))
+
 	var rapidAPIResponse RapidAPIResponse
 	err = json.Unmarshal(body, &rapidAPIResponse)
 	if err != nil {
 		log.Error().Msg("stock client :: callRapidAPI :: error unmarshalling response: " + string(body))
 		return nil, fmt.Errorf("stock client :: callRapidAPI :: error unmarshalling response: %w", err)
 	}
-
-	log.Info().Msgf("RapidAPI status: %t", rapidAPIResponse.Success)
-	log.Info().Msgf("RapidAPI raw response: %s", string(rapidAPIResponse.Data))
 
 	return &rapidAPIResponse, nil
 }
