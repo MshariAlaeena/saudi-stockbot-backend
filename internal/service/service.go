@@ -12,8 +12,6 @@ import (
 	"patient-chatbot/internal/config"
 	"patient-chatbot/internal/dto"
 	"time"
-
-	"golang.org/x/sync/errgroup"
 )
 
 var MOCK_DATA = os.Getenv("MOCK_DATA") == "true"
@@ -126,27 +124,12 @@ func (s *Service) Chat(ctx context.Context, request dto.ChatRequestDTO) (*dto.LL
 }
 
 func (s *Service) GetDashboard() ([]stock.TopFiveGainersOrLosersResponse, error) {
-	gw := errgroup.Group{}
-	var topFiveGainers []stock.TopFiveGainersOrLosersResponse
-	var topFiveLosers []stock.TopFiveGainersOrLosersResponse
-	var err error
-	gw.Go(func() error {
-		topFiveGainers, err = s.stockClient.GetTodayTopFiveGainersOrLosers(stock.TopGainers)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-
-	gw.Go(func() error {
-		topFiveLosers, err = s.stockClient.GetTodayTopFiveGainersOrLosers(stock.TopLosers)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-
-	if err := gw.Wait(); err != nil {
+	topFiveGainers, err := s.stockClient.GetTodayTopFiveGainersOrLosers(stock.TopGainers)
+	if err != nil {
+		return nil, err
+	}
+	topFiveLosers, err := s.stockClient.GetTodayTopFiveGainersOrLosers(stock.TopLosers)
+	if err != nil {
 		return nil, err
 	}
 
