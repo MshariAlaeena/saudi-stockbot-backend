@@ -15,6 +15,7 @@ type Config struct {
 	RapidAPIV1Key        string
 	RapidAPIV2Key        string
 	RapidAPIHost         string
+	FrontendURL          string
 }
 
 func Load() (*Config, error) {
@@ -31,6 +32,7 @@ func Load() (*Config, error) {
 		RapidAPIV1Key:        os.Getenv("RAPID_API_V1_KEY"),
 		RapidAPIV2Key:        os.Getenv("RAPID_API_V2_KEY"),
 		RapidAPIHost:         os.Getenv("RAPID_API_HOST"),
+		FrontendURL:          os.Getenv("FRONTEND_URL"),
 	}
 
 	if cfg.GroqAPIKey == "" ||
@@ -39,7 +41,8 @@ func Load() (*Config, error) {
 		cfg.MULTIMODAL_LLM_MODEL == "" ||
 		cfg.RapidAPIV1Key == "" ||
 		cfg.RapidAPIV2Key == "" ||
-		cfg.RapidAPIHost == "" {
+		cfg.RapidAPIHost == "" ||
+		cfg.FrontendURL == "" {
 		return nil, fmt.Errorf("missing required environment variables")
 	}
 	return cfg, nil
