@@ -19,10 +19,7 @@ type Config struct {
 }
 
 func Load() (*Config, error) {
-	err := godotenv.Load()
-	if err != nil {
-		return nil, fmt.Errorf("error loading .env file: %w", err)
-	}
+	_ = godotenv.Load()
 
 	cfg := &Config{
 		GroqAPIKey:           os.Getenv("GROQ_API_KEY"),
