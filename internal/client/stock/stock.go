@@ -7,6 +7,8 @@ import (
 	"io"
 	"net/http"
 	"patient-chatbot/internal/config"
+
+	"github.com/rs/zerolog/log"
 )
 
 type TopGainersOrLosers string
@@ -106,6 +108,7 @@ func (c *StockClient) GetTodayTopFiveGainersOrLosers(topGainersOrLosers TopGaine
 	var details []TopFiveGainersOrLosersResponse
 	err = json.Unmarshal(res.Data, &details)
 	if err != nil {
+		log.Error().Msg("stock client :: GetTodayTopFiveGainersOrLosers :: error unmarshalling response: " + string(res.Data))
 		return nil, fmt.Errorf("stock client :: GetTodayTopFiveGainersOrLosers :: error unmarshalling response: %w", err)
 	}
 	return details, nil
@@ -117,6 +120,7 @@ func (c *StockClient) SearchCompanyStocks(companyName string) (*SearchCompanySto
 	qp := QueryPayload{Query: companyName}
 	body, err := json.Marshal(qp)
 	if err != nil {
+		log.Error().Msg("stock client :: SearchCompanyStocks :: error marshalling query payload: " + err.Error())
 		return nil, fmt.Errorf("stock client :: SearchCompanyStocks :: error marshalling query payload: %w", err)
 	}
 	payload := bytes.NewReader(body)
@@ -139,6 +143,7 @@ func (c *StockClient) SearchCompanyStocks(companyName string) (*SearchCompanySto
 	var details []SearchCompanyStocksResponse
 	err = json.Unmarshal(res.Data, &details)
 	if err != nil {
+		log.Error().Msg("stock client :: SearchCompanyStocks :: error unmarshalling response: " + string(res.Data))
 		return nil, fmt.Errorf("stock client :: SearchCompanyStocks :: 	error unmarshalling response: %w", err)
 	}
 	return &details[0], nil
@@ -172,6 +177,7 @@ func (c *StockClient) callRapidAPI(req *http.Request) (*RapidAPIResponse, error)
 	var rapidAPIResponse RapidAPIResponse
 	err = json.Unmarshal(body, &rapidAPIResponse)
 	if err != nil {
+		log.Error().Msg("stock client :: callRapidAPI :: error unmarshalling response: " + string(body))
 		return nil, fmt.Errorf("stock client :: callRapidAPI :: error unmarshalling response: %w", err)
 	}
 
