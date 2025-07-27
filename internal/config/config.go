@@ -35,15 +35,33 @@ func Load() (*Config, error) {
 		FrontendURL:          os.Getenv("FRONTEND_URL"),
 	}
 
-	if cfg.GroqAPIKey == "" ||
-		cfg.LLMModel == "" ||
-		cfg.ArabicLLMModel == "" ||
-		cfg.MULTIMODAL_LLM_MODEL == "" ||
-		cfg.RapidAPIV1Key == "" ||
-		cfg.RapidAPIV2Key == "" ||
-		cfg.RapidAPIHost == "" ||
-		cfg.FrontendURL == "" {
-		return nil, fmt.Errorf("missing required environment variables")
+	missing := []string{}
+	if cfg.GroqAPIKey == "" {
+		missing = append(missing, "GROQ_API_KEY")
+	}
+	if cfg.LLMModel == "" {
+		missing = append(missing, "LLM_MODEL")
+	}
+	if cfg.ArabicLLMModel == "" {
+		missing = append(missing, "ARABIC_LLM_MODEL")
+	}
+	if cfg.MULTIMODAL_LLM_MODEL == "" {
+		missing = append(missing, "MULTIMODAL_LLM_MODEL")
+	}
+	if cfg.RapidAPIV1Key == "" {
+		missing = append(missing, "RAPID_API_V1_KEY")
+	}
+	if cfg.RapidAPIV2Key == "" {
+		missing = append(missing, "RAPID_API_V2_KEY")
+	}
+	if cfg.RapidAPIHost == "" {
+		missing = append(missing, "RAPID_API_HOST")
+	}
+	if cfg.FrontendURL == "" {
+		missing = append(missing, "FRONTEND_URL")
+	}
+	if len(missing) > 0 {
+		return nil, fmt.Errorf("missing required environment variables: %v", missing)
 	}
 	return cfg, nil
 }
