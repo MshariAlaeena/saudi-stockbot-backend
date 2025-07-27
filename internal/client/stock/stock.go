@@ -105,8 +105,6 @@ func (c *StockClient) GetTodayTopFiveGainersOrLosers(topGainersOrLosers TopGaine
 		return nil, fmt.Errorf("stock client :: GetTodayTopFiveGainersOrLosers :: error calling rapidAPI: %w", err)
 	}
 
-	log.Info().Msg("stock client :: GetTodayTopFiveGainersOrLosers :: response: " + string(res.Data))
-
 	var details []TopFiveGainersOrLosersResponse
 	err = json.Unmarshal(res.Data, &details)
 	if err != nil {
@@ -182,6 +180,9 @@ func (c *StockClient) callRapidAPI(req *http.Request) (*RapidAPIResponse, error)
 		log.Error().Msg("stock client :: callRapidAPI :: error unmarshalling response: " + string(body))
 		return nil, fmt.Errorf("stock client :: callRapidAPI :: error unmarshalling response: %w", err)
 	}
+
+	log.Info().Msgf("RapidAPI status: %t", rapidAPIResponse.Success)
+	log.Info().Msgf("RapidAPI raw response: %s", string(rapidAPIResponse.Data))
 
 	return &rapidAPIResponse, nil
 }

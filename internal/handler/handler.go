@@ -44,7 +44,7 @@ func (h *Handler) HandleChat(c *gin.Context) {
 func (h *Handler) HandleGetDashboard(c *gin.Context) {
 	data, err := h.service.GetDashboard()
 	if err != nil {
-		log.Error().Msg("error: " + err.Error())
+		log.Error().Msg("HandleGetDashboard :: " + err.Error())
 		c.JSON(500, NewResponse(nil, utils.Localize(c, "an_error_occurred_while_processing_your_request")))
 		return
 	}
