@@ -93,7 +93,7 @@ func (c *StockClient) GetDetailedCompanyStockPrices(
 
 func (c *StockClient) GetTodayTopFiveGainersOrLosers(topGainersOrLosers TopGainersOrLosers) ([]TopFiveGainersOrLosersResponse, error) {
 	url := fmt.Sprintf("%s/stock/%s", rapidAPIURL, topGainersOrLosers)
-
+	log.Info().Msgf("stock client :: GetTodayTopFiveGainersOrLosers :: url: %s", url)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("stock client :: GetTodayTopFiveGainersOrLosers :: error creating request: %w", err)
