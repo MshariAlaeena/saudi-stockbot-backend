@@ -1,101 +1,86 @@
-# RAG Patient Chatbot
+# Saudi StockBot Backend
 
-A multi-tenant medical assistant chatbot that uses Retrieval-Augmented Generation (RAG) to answer patient queries, extract information from documents/images, and schedule appointments.
+A Go-based API service powering **Saudi StockBot**, an AI-driven Tadawul (TASI) dashboard and chatbot. It handles real-time market data, chart context, chat requests, and company mapping.
 
 ## Features
 
-* **Semantic Q\&A** via Pinecone
-* **Multimodal Extraction** using llama-4-scout-17b-16e-instruct
-* **Appointment Scheduling** integration (configurable per tenant)
-* **Document Ingestion**: upload PDFs, images; extract and chunk text
-* **Per-tenant Customization**: tone, prompt templates, calendar creds
+* **Chat API**: Context-aware AI conversations with chart data attachment
+* **Chart Data**: Detailed OHLC and volume endpoints for company stocks
+* **Top Movers**: Gain and loss listings via dedicated endpoints
+* **Company Mapping**: `companyId ↔ tadawulId` loader from embedded JSON
+* **Mock & Real Feeds**: Pluggable data sources (real feed + mock fallback)
+* **Health Checks**: Simple status endpoint
 
 ## Tech Stack
 
-* **Backend:** Go (Gin)
-* **Embeddings and Vector DB:** Pinecone (integrated inference)
-* **LLM API:** Groq (llama-3.3-70b-versatile)
-* **LLM API:** Groq (llama-4-scout-17b-16e-instruct)
+* **Language:** Go 1.20+
+* **Framework:** Gin HTTP router
+* **LLM API:** Groq chat completion (with function/tool calls)
+* **Data Storage:** In-memory & JSON-embedded mapping
 
 ## Architecture
 
 ```
 Client ⇄ Gin API ⇄ Services:
-  • VectorDB    (Pinecone)
-  • LLM         (Groq)
+  • Stock Data Client   (RapidAPI / Mock)
+  • Chat Service        (Groq)
+  • Mapping Loader      (embed JSON)
 ```
 
 ## Getting Started
 
 ### Prerequisites
 
-* Go 1.20+
-* Pinecone project (with integrated inference index)
-* Groq API keys
+* Go 1.20 or higher
+* Groq API key
+* RapidAPI credentials for Saudi market data
 
 ### Installation
 
 ```bash
-git clone https://github.com/your-org/rag-patient-chatbot.git
-cd rag-patient-chatbot
+git clone https://github.com/your-org/saudi-stockbot-backend.git
+cd saudi-stockbot-backend
 go mod download
-go build -o patient-chatbot ./cmd
+go build -o stockbot-backend ./cmd/server
 ```
 
 ### Configuration
 
-Copy `.env.example` to `.env` and fill in with your values:
+Copy `.env.example` to `.env` and update:
 
 ```dotenv
-PINECONE_NAMESPACE=your_pinecone_namespace
-PINECONE_API_KEY=…
-PINECONE_INDEX=…
-PINECONE_HOST=…
-GROQ_API_KEY=…
-LLM_MODEL=…
-ARABIC_LLM_MODEL=…
-MULTIMODAL_LLM_MODEL=…
-DB_HOST=…
-DB_PORT=…
-DB_USER=…
-DB_PASSWORD=…
-DB_NAME=…
+GROQ_API_KEY=your_groq_api_key
+LLM_MODEL=your_groq_llm_model
+RAPID_API_V1_KEY=your_rapid_v1_api_key
+RAPID_API_V2_KEY=your_rapid_v2_api_key
+RAPID_API_HOST=your_rapid_host
+FRONTEND_URL=your_frontend_url
 ```
 
 ## Running
 
-With the Makefile and `.env` in place, you have two options:
-
-**1. Build & run via Makefile**
+**1. Build & run:**
 
 ```bash
-cp .env.example .env     # one-time only
-make run                  # builds and runs the server
+make run
 ```
 
-**2. Development mode (no binary)**
+**2. Development mode:**
 
 ```bash
-make run-dev              # loads .env and runs via `go run`
+make run-dev
 ```
 
-Server listens on **:8080** by default.
+Defaults to listening on **:8080**.
 
 ## API Endpoints
 
-### Upload Document
+### Health Check
 
 ```
-POST /api/v1/upload
-Content-Type: multipart/form-data
-Fields:
-  - org_id: UUID
-  - file: binary
-Response: 200 Success
-{
-  "doc_id": "<uuid>",
-  "ingestion_status": "pending"
-}
+GET /health
+Response 200
+{ "status": "ok" }
 ```
 
 ### Chat
@@ -105,36 +90,18 @@ POST /api/v1/chat
 Content-Type: application/json
 Body:
 {
-  "model": "<model-name>",
-  "messages": [ ... ],
-  "temperature": 1.0,
-  "max_completion_tokens": 1024,
-  "top_p": 1.0,
-  "stream": false
+  "messages": [ { "role": "user", "content": "..." }, … ],
+  "context": {          // optional
+    "chart": "search_company_stocks" | "detailed_company_stock_prices",
+    "stocks": { … } | [ … ]
+  }
 }
-Response: 200 OK
+Response 200
 {
-  "answer": "...",
-  "sources": ["<chunk_id>", ...]
+  "choices": [ { "message": { "role": "assistant", "content": "...", "tool_calls": […] } } ]
 }
 ```
-
-### Health Check
-
-```
-GET /api/v1/health
-Response: 200 OK
-{ "status": "ok" }
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/awesome`)
-3. Commit your changes (`git commit -m "Add awesome feature"`)
-4. Push to your branch (`git push origin feature/awesome`)
-5. Open a Pull Request
 
 ## License
 
-This project is licensed under the MIT License.
+MIT License.
